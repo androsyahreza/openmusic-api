@@ -30,7 +30,8 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      text: 'SELECT a.id, a.name, a.year, s.id AS song_id, s.title, s.performer FROM albums a LEFT JOIN songs s ON a.id = s.album_id WHERE a.id = $1',
+      text: `SELECT a.id, a.name, a.year, s.id AS song_id, s.title, s.performer 
+      FROM albums a LEFT JOIN songs s ON a.id = s.album_id WHERE a.id = $1`,
       values: [id],
     };
     const result = await this._pool.query(query);

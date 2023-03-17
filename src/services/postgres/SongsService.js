@@ -10,12 +10,7 @@ class SongsService {
   }
 
   async addSong({
-    title,
-    year,
-    genre,
-    performer,
-    duration,
-    albumId,
+    title, year, genre, performer, duration, albumId,
   }) {
     const id = `song-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
@@ -37,7 +32,9 @@ class SongsService {
 
   async getSongs(title, performer) {
     const query = {
-      text: "SELECT s.id, s.title, s.performer FROM songs s WHERE s.title ILIKE '%' || COALESCE($1, '') || '%' AND s.performer ILIKE '%' || COALESCE($2, '') || '%'",
+      text: `SELECT s.id, s.title, s.performer FROM songs s 
+      WHERE s.title ILIKE '%' || COALESCE($1, '') || '%' 
+      AND s.performer ILIKE '%' || COALESCE($2, '') || '%'`,
       values: [title, performer],
     };
 
@@ -60,12 +57,7 @@ class SongsService {
   }
 
   async editSongById(id, {
-    title,
-    year,
-    performer,
-    genre,
-    duration,
-    albumId,
+    title, year, performer, genre, duration, albumId,
   }) {
     const updatedAt = new Date().toISOString();
     const query = {

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const autoBind = require('auto-bind');
 
 class AlbumHandler {
@@ -11,14 +10,12 @@ class AlbumHandler {
 
   async postAlbumHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
-    const { name, year } = request.payload;
-
-    const album_id = await this._service.addAlbum({ name, year });
+    const albumId = await this._service.addAlbum(request.payload);
 
     const response = h.response({
       status: 'success',
       data: {
-        albumId: album_id,
+        albumId,
       },
     });
 

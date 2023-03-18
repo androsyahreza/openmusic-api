@@ -13,16 +13,15 @@ class UsersService {
     await this.verifyNewUsername(username);
     const id = `user-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = {
-      text: 'INSERT INTO users VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
-      values: [id, username, hashedPassword, fullname, createdAt, updatedAt],
+      text: 'INSERT INTO users VALUES($1, $2, $3, $4, $5, $5) RETURNING id',
+      values: [id, username, hashedPassword, fullname, createdAt],
     };
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('User gagal ditambahkan');
     }
     return result.rows[0].id;
@@ -41,7 +40,7 @@ class UsersService {
     }
   }
 
-  async verifyUserCredential(username, password) {
+  async verifyUserCredential({ username, password }) {
     const query = {
       text: 'SELECT id, password FROM users WHERE username = $1',
       values: [username],
@@ -49,7 +48,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new AuthenticationError('Kredensial yang Anda berikan salah');
     }
 

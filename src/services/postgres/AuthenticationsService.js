@@ -8,10 +8,9 @@ class AuthenticationsService {
 
   async addRefreshToken(token) {
     const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
     const query = {
-      text: 'INSERT INTO authentications VALUES($1, $2, $3)',
-      values: [token, createdAt, updatedAt],
+      text: 'INSERT INTO authentications VALUES($1, $2, $2)',
+      values: [token, createdAt],
     };
 
     await this._pool.query(query);
@@ -25,7 +24,7 @@ class AuthenticationsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Refresh token tidak valid');
     }
   }

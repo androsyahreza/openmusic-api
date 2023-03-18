@@ -11,16 +11,15 @@ class CollaborationsService {
   async addCollaboration(playlistId, userId) {
     const id = `collab-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
 
     const query = {
-      text: 'INSERT INTO collaborations VALUES($1, $2, $3, $4, $5) RETURNING id',
-      values: [id, playlistId, userId, createdAt, updatedAt],
+      text: 'INSERT INTO collaborations VALUES($1, $2, $3, $4, $4) RETURNING id',
+      values: [id, playlistId, userId, createdAt],
     };
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Kolaborasi gagal ditambahkan');
     }
     return result.rows[0].id;
@@ -34,7 +33,7 @@ class CollaborationsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Kolaborasi gagal dihapus');
     }
   }
@@ -47,7 +46,7 @@ class CollaborationsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Kolaborasi gagal diverifikasi');
     }
   }
@@ -60,7 +59,7 @@ class CollaborationsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('User tidak ditemukan');
     }
   }

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const autoBind = require('auto-bind');
 
 class SongHandler {
@@ -11,28 +10,13 @@ class SongHandler {
 
   async postSongHandler(request, h) {
     this._validator.validateSongPayload(request.payload);
-    const {
-      title,
-      year,
-      genre,
-      performer,
-      duration,
-      albumId,
-    } = request.payload;
 
-    const song_id = await this._service.addSong({
-      title,
-      year,
-      genre,
-      performer,
-      duration,
-      albumId,
-    });
+    const songId = await this._service.addSong(request.payload);
 
     const response = h.response({
       status: 'success',
       data: {
-        songId: song_id,
+        songId,
       },
     });
 

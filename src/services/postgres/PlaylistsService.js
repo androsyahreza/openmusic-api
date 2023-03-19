@@ -90,15 +90,15 @@ class PlaylistsService {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    const album = result.rows.map(PlaylistsMapDBToModel)[0];
-    album.songs = result.rows
+    const playlist = result.rows.map(PlaylistsMapDBToModel)[0];
+    playlist.songs = result.rows
       .filter((row) => row.song_id !== null)
       .map((row) => ({
         id: row.song_id,
         title: row.title,
         performer: row.performer,
       }));
-    return album;
+    return playlist;
   }
 
   async deleteSongFromPlaylist(playlistId, songId) {

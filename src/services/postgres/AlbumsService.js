@@ -104,12 +104,12 @@ class AlbumsService {
   }
 
   async addUserAlbumLikes(userId, albumId) {
-    const seletQuery = {
+    const selectQuery = {
       text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
       values: [userId, albumId],
     };
     try {
-      const result = await this._pool.query(seletQuery);
+      const result = await this._pool.query(selectQuery);
       let message = '';
       let query = '';
       if (!result.rowCount) {

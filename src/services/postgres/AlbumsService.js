@@ -104,32 +104,31 @@ class AlbumsService {
   }
 
   async addUserAlbumLikes(userId, albumId) {
-    const query = {
+    const seletQuery = {
       text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
       values: [userId, albumId],
     };
     try {
-      const result = await this._pool.query(query);
+      const result = await this._pool.query(seletQuery);
       let message = '';
+      let query = '';
       if (!result.rowCount) {
         const id = `albumlikes-${nanoid(16)}`;
         const createdAt = new Date().toISOString();
-        const insertQuery = {
+        query = {
           text: 'INSERT INTO user_album_likes VALUES($1, $2, $3, $4, $4)',
           values: [id, userId, albumId, createdAt],
         };
-        await this._pool.query(insertQuery);
         message = 'Album berhasil disukai';
-        await this._cacheService.delete(`albums:${albumId}`);
       } else {
-        const deleteQuery = {
+        query = {
           text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
           values: [userId, albumId],
         };
-        await this._pool.query(deleteQuery);
         message = 'Album batal disukai';
-        await this._cacheService.delete(`albums:${albumId}`);
       }
+      await this._pool.query(query);
+      await this._cacheService.delete(`albums:${albumId}`);
       return message;
     } catch (error) {
       throw new InvariantError('Gagal menyukai atau tidak menyukai album');

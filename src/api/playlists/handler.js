@@ -24,16 +24,20 @@ class PlaylistHandler {
     return response;
   }
 
-  async getPlaylistsHandler(request) {
+  async getPlaylistsHandler(request, h) {
     const { id: credentialId } = request.auth.credentials;
 
-    const playlists = await this._service.getPlaylist({ owner: credentialId });
-    return {
+    const { playlists, isCache } = await this._service.getPlaylist({ owner: credentialId });
+    const response = h.response({
       status: 'success',
       data: {
         playlists,
       },
-    };
+    });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
   }
 
   async deletePlaylistByIdHandler(request) {
@@ -41,7 +45,7 @@ class PlaylistHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistOwner(id, credentialId);
-    await this._service.deletePlaylistById(id);
+    await this._service.deletePlaylistById(id, credentialId);
 
     return {
       status: 'success',
@@ -67,19 +71,23 @@ class PlaylistHandler {
     return response;
   }
 
-  async getPlaylistSongByIdHandler(request) {
+  async getPlaylistSongByIdHandler(request, h) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistsAccess(id, credentialId);
-    const playlist = await this._service.getSongFromPlaylist(id);
+    const { playlist, isCache } = await this._service.getSongFromPlaylist(id);
 
-    return {
+    const response = h.response({
       status: 'success',
       data: {
         playlist,
       },
-    };
+    });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
   }
 
   async deletePlaylistSongByIdHandler(request) {
@@ -98,20 +106,24 @@ class PlaylistHandler {
     };
   }
 
-  async getPlaylistActivitiesByIdHandler(request) {
+  async getPlaylistActivitiesByIdHandler(request, h) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
     await this._service.verifyPlaylistsAccess(id, credentialId);
-    const result = await this._service.getPlaylistActivities(id);
+    const { activities, isCache } = await this._service.getPlaylistActivities(id);
 
-    return {
+    const response = h.response({
       status: 'success',
       data: {
         playlistId: id,
-        activities: result,
+        activities,
       },
-    };
+    });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
   }
 }
 

@@ -24,15 +24,20 @@ class SongHandler {
     return response;
   }
 
-  async getSongsHandler(request) {
+  async getSongsHandler(request, h) {
     const { title, performer } = request.query;
-    const songs = await this._service.getSongs(title, performer);
-    return {
+    const { songs, isCache } = await this._service.getSongs(title, performer);
+
+    const response = h.response({
       status: 'success',
       data: {
         songs,
       },
-    };
+    });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
   }
 
   async getSongByIdHandler(request) {

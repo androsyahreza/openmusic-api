@@ -4,8 +4,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class SongsService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addSong({
@@ -25,19 +26,29 @@ class SongsService {
       throw new InvariantError('Lagu gagal ditambahkan');
     }
 
+    await this._cacheService.delete('songs');
     return result.rows[0].id;
   }
 
   async getSongs(title, performer) {
-    const query = {
-      text: `SELECT s.id, s.title, s.performer FROM songs s 
-      WHERE s.title ILIKE '%' || COALESCE($1, '') || '%' 
-      AND s.performer ILIKE '%' || COALESCE($2, '') || '%'`,
-      values: [title, performer],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows;
+    try {
+      const result = await this._cacheService.get('songs');
+      return {
+        songs: JSON.parse(result),
+        isCache: true,
+      };
+    } catch (error) {
+      const query = {
+        text: `SELECT s.id, s.title, s.performer FROM songs s 
+        WHERE s.title ILIKE '%' || COALESCE($1, '') || '%' 
+        AND s.performer ILIKE '%' || COALESCE($2, '') || '%'`,
+        values: [title, performer],
+      };
+      const result = await this._pool.query(query);
+      const songs = result.rows;
+      await this._cacheService.set('songs', JSON.stringify(songs));
+      return { songs };
+    }
   }
 
   async getSongById(id) {
@@ -68,6 +79,8 @@ class SongsService {
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui Lagu. Id tidak ditemukan');
     }
+
+    await this._cacheService.delete('songs');
   }
 
   async deleteSongById(id) {
@@ -81,6 +94,8 @@ class SongsService {
     if (!result.rowCount) {
       throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
     }
+
+    await this._cacheService.delete('songs');
   }
 }
 

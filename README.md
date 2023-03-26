@@ -1,7 +1,7 @@
 # openmusic-api
 [![Generic badge](https://img.shields.io/badge/npm-v14.16.1-blue.svg)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/node-6.14.12-green.svg)](https://shields.io/)
 
-OpenMusic is digital music service built with Hapi.js
+OpenMusic is a digital music service that provides a RESTful API built with Hapi.js. 
 
 ## Table of contents
 * [General info](#general-info)
